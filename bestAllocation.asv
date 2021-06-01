@@ -1,10 +1,20 @@
 function allocation = bestAllocation(subtasks)
     nTasks = length(subtasks);
     nAllocations = 2^(nTasks);
-    best
+    bestJ = realmax;
     for i = 0:nAllocations-1
         bin = pad(dec2bin(i),nTasks,'left','0');
-        
+        J = 0;
+        for j=1:length(bin)
+            if( logical(str2num(bin(j))) )
+            Di = 
+            J = J +
+            end
+        end
+        if J > bestJ
+            bestJ = J;
+            allocation = bin;
+        end
     end
 end
 

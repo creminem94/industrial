@@ -5,11 +5,11 @@ iiwaRBT = importrobot('iiwa14.urdf');
 iiwaSM = smimport(iiwaRBT);
 
 %% list of subtasks
-P1 = [0 0 0]; %minipallet
-P2 = [2 3 5]; %vicino al kuka
-P3 = [10 10 10]; %vicino all'abb
-P4 = [1 1 1];
-%  startPos
+P1 = [0 0 0]; % minipallet
+P2 = [2 3 5]; % vicino al kuka
+P3 = [10 10 10]; % vicino all'abb
+P4 = [1 1 1]; % vicino al kuka
+%         startPos
 %         endPos
 %         type %move/assemble
 %         Dk %kuka potential incapability coeff
@@ -23,4 +23,4 @@ subs = [
     subtask(P4,P1,'assembly',0.1,0.6,0.7,0.1)
     subtask(P3,P1,'assembly',0.5,0.1,0.7,0.1)
 ];
-bestAllocation(subs);
+allocation = bestAllocation(subs);
