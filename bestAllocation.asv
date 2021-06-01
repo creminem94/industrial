@@ -1,0 +1,10 @@
+function allocation = bestAllocation(subtasks)
+    nTasks = length(subtasks);
+    nAllocations = 2^(nTasks);
+    best
+    for i = 0:nAllocations-1
+        bin = pad(dec2bin(i),nTasks,'left','0');
+        
+    end
+end
+
