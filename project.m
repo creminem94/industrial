@@ -1,8 +1,8 @@
 %% this is used to generate the subsystem in simscape
-yumi = importrobot('abbyumi.urdf');
-yumiSM = smimport(yumi);
-iiwaRBT = importrobot('iiwa14.urdf');
-iiwaSM = smimport(iiwaRBT);
+yumi = loadrobot('abbYuMi');
+% yumiSM = smimport(yumi);
+iiwaRBT = loadrobot('kukaIiwa14');
+% iiwaSM = smimport(iiwaRBT);
 
 %% list of subtasks
 P1 = [0 0 0]; % minipallet
