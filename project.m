@@ -60,5 +60,13 @@ for i=1:1
     placePosT(1:3,end) = task_i.endPos(1,1:3)';
     
     [placeConfig, placeSolInfo] = execIK(execEEName, placePosT, weights, pickConfig);
+    
+%     points = [
+%         [0,2,4,8,10,11,13] %time
+%         [10,20,0,30,40,35,0] %position
+%         [-5,0,0,5,0,1,7] %velocities
+%     ];
+%     Ts = 0.001;
+%     traj = multiPointImpV(points,Ts);
 
 end
