@@ -1,0 +1,5 @@
+home config
+world ref
+distanza tra i bot
+tempo di arrivo minipallet
+end effector kuka
