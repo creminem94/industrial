@@ -3,6 +3,7 @@ classdef subtask
     properties
         startPos
         endPos
+        % timeSeries                                        TODO
         type %move/assemble
         Dk %kuka potential incapability coeff
         Da %abb
