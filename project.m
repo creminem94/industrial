@@ -71,24 +71,25 @@ for i=1:1
 
     % Trajectory
     nJoints = length(execHomeConfig);
-    traj = zeros(1, nJoints);
+    
     % timeSeries = task_i.timeSeries;       TODO
     timeSeries = [0, 2, 4, 6];
-    
+    clear traj;
     for j=1:nJoints
         
         % Intermediate configurations
         homeq = execHomeConfig(j).JointPosition;
-        pickingq = pickingConfig(j).JointPosition;
-        placingq = placingConfig(j).JointPosition;
+        pickq = pickConfig(j).JointPosition;
+        placeq = placeConfig(j).JointPosition;
         
         points = [
             timeSeries                          % Time Series
-            [homeq, pickingq, placingq, homeq]  % Joint Configurations
+            homeq, pickq, placeq, homeq  % Joint Configurations
             zeros(1, 4)                         % Joint Velocities
         ];
         
-        traj(i) = multiPointImpV(points, Ts);
+        traj(j) = multiPointImpV(points, Ts);
+        plotTrajectories(traj(j));
     end
     
     % Simulation
