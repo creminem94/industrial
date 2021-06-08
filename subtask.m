@@ -3,7 +3,7 @@ classdef subtask
     properties
         startPos
         endPos
-        % timeSeries                                        TODO
+        taskTime
         type %move/assemble
         Dk %kuka potential incapability coeff
         Da %abb
@@ -13,15 +13,16 @@ classdef subtask
     end
     
     methods
-        function obj = subtask(startPos,endPos,type,Dk,Da,Pk,Pa,description)
+        function obj = subtask(startPos,endPos,taskTime,type,Dk,Da,Pk,Pa,description)
             obj.startPos = startPos;
             obj.endPos = endPos;
+            obj.taskTime = taskTime;
             obj.type = type;
             obj.Dk = Dk;
             obj.Da = Da;
             obj.Pk = Pk;
             obj.Pa = Pa;
-            if nargin == 8
+            if nargin == 9
                 obj.description = description;
             else
                 obj.description = "";

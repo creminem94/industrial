@@ -20,10 +20,10 @@ P4 = [1, 1, 1, pi, 0, pi/2]; % vicino al kuka
 %         Pa %abb
 %         description
 subs = [
-    subtask(P1,P2,'move',0.1,0.3,0.1,0.3)
-    subtask(P1,P3,'move',0.5,0.1,0.4,0.1)
-    subtask(P4,P1,'assembly',0.1,0.6,0.7,0.1)
-    subtask(P3,P1,'assembly',0.5,0.1,0.7,0.1)
+    subtask(P1,P2,5,'move',0.1,0.3,0.1,0.3)
+    subtask(P1,P3,5,'move',0.5,0.1,0.4,0.1)
+    subtask(P4,P1,5,'assembly',0.1,0.6,0.7,0.1)
+    subtask(P3,P1,5,'assembly',0.5,0.1,0.7,0.1)
 ];
 allocation = bestAllocation(subs);
 
@@ -73,8 +73,7 @@ for i=1:1
     % Trajectory
     nJoints = length(execHomeConfig);
     
-    % timeSeries = task_i.timeSeries;       TODO
-    timeSeries = [0, 2, 4, 6];
+    
     clear traj;
     for j=1:nJoints
         
@@ -82,15 +81,19 @@ for i=1:1
         homeq = execHomeConfig(j).JointPosition;
         pickq = pickConfig(j).JointPosition;
         placeq = placeConfig(j).JointPosition;
-        
+        positions = [homeq, pickq, placeq, homeq];
+        if j == 1
+            tk = getTimeDistrubution(positions, 'cord');
+            tk = round(tk/Ts)*Ts*task_i.taskTime;
+        end
         points = [
-            timeSeries                          % Time Series
-            homeq, pickq, placeq, homeq  % Joint Configurations
-            zeros(1, 4)                         % Joint Velocities
+            tk          % Time Series
+            positions   % Joint Configurations
+            zeros(1, 4) % Joint Velocities
         ];
-        
+   
         traj(j) = multiPointImpV(points, Ts);
-        plotTrajectories(traj(j));
+        plotTrajectories(traj(j),tk);
     end
     
     % Simulation
