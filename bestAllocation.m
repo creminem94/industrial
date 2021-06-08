@@ -1,4 +1,6 @@
-function allocation = bestAllocation(subtasks)
+function allocation = bestAllocation(subtasks, W)
+    Wda = W(1); Wpa = W(2);
+    Wdk = W(3); Wpk = W(4);
     nTasks = length(subtasks);
     nAllocations = 2^(nTasks);
     bestJ = realmax;
@@ -8,13 +10,17 @@ function allocation = bestAllocation(subtasks)
         J = 0;
         for j=1:nTasks
             if logical(str2num(bin(j))) % 1 -> Kuka
-                Di = subtasks(j).Dk;
-                Pi = subtasks(j).Pk;
+                Dk = subtasks(j).Dk;
+                Pk = subtasks(j).Pk;
+                Da = 0;
+                Pa = 0;
             else                        % 0 -> ABB
-                Di = subtasks(j).Da;
-                Pi = subtasks(j).Pa;                
+                Da = subtasks(j).Da;
+                Pa = subtasks(j).Pa;                
+                Dk = 0;
+                Pk = 0;
             end
-            J = J + Di + Pi;
+            J = J + (Wda*Da + Wpa*Pa + Wdk*Dk + Wpk*Pk);
         end
         
         if J < bestJ

@@ -25,7 +25,8 @@ subs = [
     subtask(P4,P1,5,'assembly',0.1,0.6,0.7,0.1)
     subtask(P3,P1,5,'assembly',0.5,0.1,0.7,0.1)
 ];
-allocation = bestAllocation(subs);
+W = [1, 1, 1, 1];
+allocation = bestAllocation(subs, W);
 
 %% Tasks Simulation
 nTasks = length(subs);
