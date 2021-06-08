@@ -41,12 +41,13 @@ for i=1:1
 	if logical(str2num(allocation(i)))
 		execCobot = iiwaRBT;
         execIK = iiwaIK;
+        execEEName = 'iiwa_link_ee_kuka';
 	else
 		execCobot = yumi;
         execIK = yumiIK;
+        execEEName = 'gripper_l_base';        
     end
     execHomeConfig = homeConfiguration(execCobot);
-    execEEName = string(execCobot.BodyNames(end));
     
     % Subtask execution
 
