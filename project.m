@@ -75,6 +75,7 @@ for i=1:1
     
     
     clear traj;
+    clear fakeTraj;
     for j=1:nJoints
         
         % Intermediate configurations
@@ -93,8 +94,47 @@ for i=1:1
         ];
    
         traj(j) = multiPointImpV(points, Ts);
-        plotTrajectories(traj(j),tk);
+        
+        %plotTrajectories(traj(j),tk);
     end
+    
+    if i == 1
+        if execCobot == iiwaRBT
+            iiwaTraj = traj;
+            for k = 1:18
+                points(2,:) = [0,0,0,0];
+                yumiTraj(k) = multiPointImpV(points, Ts);
+            end
+        else
+            yumiTraj = traj;
+            for k = 1:7
+                points(2,:) = [0,0,0,0];
+                iiwaTraj(k) = multiPointImpV(points, Ts);
+            end
+        end
+    else
+        if execCobot == iiwaRBT
+            iiwaTraj = mergeTrajectories([iiwaTraj,traj]);
+            for k = 1:18
+                points(2,:) = [1,1,1,1];
+                newTraj(k) = multiPointImpV(points, Ts);
+                newTraj(k).q = ones(length(traj(1).q),1)*yumiTraj(k).q(length(yumiTraj(1).q));
+            end
+            yumiTraj = mergeTrajectories([yumiTraj, newTraj]);
+        else
+            yumiTraj = mergeTrajectories([yumiTraj,traj]);
+            for k = 1:7
+                points(2,:) = [1,1,1,1];
+                newTraj(k) = multiPointImpV(points, Ts);
+                newTraj(k).q = newTraj(k).q*iiwaTraj(k).q(length(iiwaTraj(1).q));
+            end
+            iiwaTraj = mergeTrajectories([iiwaTraj, newTraj]);
+        end
+       
+        %mergeTrajectories([iwaaTraj,traj]);
+    end
+   
+    
     
     % Simulation
     % TODO
