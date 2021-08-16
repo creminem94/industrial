@@ -1,44 +1,54 @@
-%% this is used to generate the subsystem in simscape
+%% Design for Collaborative Assembly with the ICE Lab Robots
 clc; clear all; close all;
 
-yumi = loadrobot('abbYuMi');
-% yumiSM = smimport(yumi);
-iiwaRBT = loadrobot('kukaIiwa14');
-% iiwaSM = smimport(iiwaRBT);
+%% Best subtasks allocation
 
-%% list of subtasks
+% 3D points in the work place
 P1 = [1, 1, 1, pi, 0, pi/2]; % minipallet
 P2 = [2, 3, 5, 0, 0, pi/2]; % vicino al kuka
 P3 = [10, 10, 10, pi/4, pi/4, 0]; % vicino all'abb
 P4 = [1, 1, 1, pi, 0, pi/2]; % vicino al kuka
-%         startPos
-%         endPos
-%         type %move/assemble
-%         Dk %kuka potential incapability coeff
-%         Da %abb
-%         Pk %kuka potential insufficeincy coeff for precios
-%         Pa %abb
-%         description
+
+% List of subtasks:
+%   startPos
+%   endPos
+%   type (move, assembly)
+%   Dk
+%   Da
+%   Pk
+%   Pa
+%   description
 subs = [
     subtask(P1,P2,5,'move',0.1,0.3,0.1,0.3)
     subtask(P1,P3,5,'move',0.5,0.1,0.4,0.1)
     subtask(P4,P1,5,'assembly',0.1,0.6,0.7,0.1)
     subtask(P3,P1,5,'assembly',0.5,0.1,0.7,0.1)
 ];
+
+% Weight factors
 W = [1, 1, 1, 1];
+
+% Best allocation algorithm
 allocation = bestAllocation(subs, W);
 
 %% Tasks Simulation
-nTasks = length(subs);
 
+% Cobot models
+yumi = loadrobot('abbYuMi');
+iiwaRBT = loadrobot('kukaIiwa14');
+
+% Inverse kinematics of cobots
 iiwaIK = inverseKinematics('RigidBodyTree', iiwaRBT);
 yumiIK = inverseKinematics('RigidBodyTree', yumi);
 
+% Sampling time for trajectories
 Ts = 0.001;
 
-for i=1:length(subs)
+nTasks = length(subs);
+for i=1:nTasks
 	task_i = subs(i);
 	
+    % Executive robot
 	if logical(str2num(allocation(i)))
 		execCobot = iiwaRBT;
         execIK = iiwaIK;
@@ -50,12 +60,12 @@ for i=1:length(subs)
     end
     execHomeConfig = homeConfiguration(execCobot);
     
-    % Subtask execution
+    % Inverse Kinematics of Intermediate Configurations
+    weights = ones(1,6);
 
     % IK of picking position
     pickPosT = eul2tform(task_i.startPos(4:6));
     pickPosT(1:3,end) = task_i.startPos(1:3)';
-    weights = ones(1,6);
     
     [pickConfig, pickSolInfo] = execIK(execEEName, pickPosT, weights, execHomeConfig);
     
@@ -71,12 +81,10 @@ for i=1:length(subs)
     
     [finalHConfig, finalHSolInfo] = execIK(execEEName, placePosT, weights, pickConfig);
 
-    % Trajectory
-    nJoints = length(execHomeConfig);
-    
-    
+    % Trajectory Computation
     clear traj;
-    clear fakeTraj;
+    
+    nJoints = length(execHomeConfig);
     for j=1:nJoints
         
         % Intermediate configurations
@@ -84,20 +92,23 @@ for i=1:length(subs)
         pickq = pickConfig(j).JointPosition;
         placeq = placeConfig(j).JointPosition;
         positions = [homeq, pickq, placeq, homeq];
+
+        % Time distribution for the current subtaks
         if j == 1
             tk = getTimeDistrubution(positions, 'eq');
             tk = round(tk/Ts)*Ts*task_i.taskTime;
         end
+        
         points = [
             tk          % Time Series
             positions   % Joint Configurations
             zeros(1, 4) % Joint Velocities
         ];
-   
+
+        % Compute trajectory for the j-th joint
         traj(j) = multiPointImpV(points, Ts);
-        
-        %plotTrajectories(traj(j),tk);
-    end
+
+    end % for j=1:nJoints
     
     if i == 1
         if execCobot == iiwaRBT
@@ -134,14 +145,7 @@ for i=1:length(subs)
                 end
                 yumiTraj(k) = mergeTrajectories([yumiTraj(k),traj(k)]);
             end
-            
-        end
-       
-        %mergeTrajectories([iwaaTraj,traj]);
-    end
-   
+        end % if execCobot == iiwaRBT
+    end % if i == 1
     
-    
-    % Simulation
-    % TODO
-end
+end % for i=1:nTasks
