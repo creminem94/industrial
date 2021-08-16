@@ -36,7 +36,7 @@ yumiIK = inverseKinematics('RigidBodyTree', yumi);
 
 Ts = 0.001;
 
-for i=1:1
+for i=1:length(subs)
 	task_i = subs(i);
 	
 	if logical(str2num(allocation(i)))
@@ -85,7 +85,7 @@ for i=1:1
         placeq = placeConfig(j).JointPosition;
         positions = [homeq, pickq, placeq, homeq];
         if j == 1
-            tk = getTimeDistrubution(positions, 'cord');
+            tk = getTimeDistrubution(positions, 'eq');
             tk = round(tk/Ts)*Ts*task_i.taskTime;
         end
         points = [
@@ -115,21 +115,26 @@ for i=1:1
         end
     else
         if execCobot == iiwaRBT
-            iiwaTraj = mergeTrajectories([iiwaTraj,traj]);
             for k = 1:18
+                if k <= 7 
+                    iiwaTraj(k) = mergeTrajectories([iiwaTraj(k),traj(k)]);
+                end
                 points(2,:) = [1,1,1,1];
                 newTraj(k) = multiPointImpV(points, Ts);
-                newTraj(k).q = ones(length(traj(1).q),1)*yumiTraj(k).q(length(yumiTraj(1).q));
+                newTraj(k).q = ones(length(traj(1).q),1)*yumiTraj(k).q(length(yumiTraj(k).q));
+                yumiTraj(k) = mergeTrajectories([yumiTraj(k), newTraj(k)]);
             end
-            yumiTraj = mergeTrajectories([yumiTraj, newTraj]);
         else
-            yumiTraj = mergeTrajectories([yumiTraj,traj]);
-            for k = 1:7
-                points(2,:) = [1,1,1,1];
-                newTraj(k) = multiPointImpV(points, Ts);
-                newTraj(k).q = newTraj(k).q*iiwaTraj(k).q(length(iiwaTraj(1).q));
+            for k = 1:18
+                if k <= 7
+                    points(2,:) = [1,1,1,1];
+                    newTraj(k) = multiPointImpV(points, Ts);
+                    newTraj(k).q = newTraj(k).q*iiwaTraj(k).q(length(iiwaTraj(k).q));
+                    iiwaTraj(k) = mergeTrajectories([iiwaTraj(k), newTraj(k)]);
+                end
+                yumiTraj(k) = mergeTrajectories([yumiTraj(k),traj(k)]);
             end
-            iiwaTraj = mergeTrajectories([iiwaTraj, newTraj]);
+            
         end
        
         %mergeTrajectories([iwaaTraj,traj]);

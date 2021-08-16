@@ -11,11 +11,7 @@ function traj = mergeTrajectories(trajectories,props)
             if ~isfield(argTraj,prop)
                 continue;
             end
-            newData = argTraj.(prop);
-            if prop == "t" && i > 1
-                newData = newData+v(length(v));
-            end
-            v = [v newData];
+            v = [v argTraj.(prop)];
         end
         traj.(prop) = v;
     end

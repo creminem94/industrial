@@ -25,7 +25,8 @@ subs = [
     subtask(P4,P1,5,'assembly',0.1,0.6,0.7,0.1)
     subtask(P3,P1,5,'assembly',0.5,0.1,0.7,0.1)
 ];
-allocation = bestAllocation(subs);
+W = [1, 1, 1, 1];
+allocation = bestAllocation(subs, W);
 
 %% Tasks Simulation
 nTasks = length(subs);
@@ -35,7 +36,7 @@ yumiIK = inverseKinematics('RigidBodyTree', yumi);
 
 Ts = 0.001;
 
-for i=1:length(subs)
+for i=1:2
 	task_i = subs(i);
 	
 	if logical(str2num(allocation(i)))
@@ -102,31 +103,38 @@ for i=1:length(subs)
         if execCobot == iiwaRBT
             iiwaTraj = traj;
             for k = 1:18
-                points(2) = [0,0,0,0];
+                points(2,:) = [0,0,0,0];
                 yumiTraj(k) = multiPointImpV(points, Ts);
             end
         else
             yumiTraj = traj;
             for k = 1:7
-                points(2) = [0,0,0,0];
+                points(2,:) = [0,0,0,0];
                 iiwaTraj(k) = multiPointImpV(points, Ts);
             end
         end
     else
         if execCobot == iiwaRBT
-            iiwaTraj = mergeTrajectories([iiwaTraj,traj],["q"]);
             for k = 1:18
-                points(2) = [1,1,1,1];
+                if k <= 7 
+                    iiwaTraj(k) = mergeTrajectories([iiwaTraj(k),traj(k)]);
+                end
+                points(2,:) = [1,1,1,1];
                 newTraj(k) = multiPointImpV(points, Ts);
                 newTraj(k).q = ones(length(traj(1).q),1)*yumiTraj(k).q(length(yumiTraj(1).q));
             end
-            yumiTraj = mergeTrajectories([yumiTraj, newTraj],["q"]);
+            yumiTraj = mergeTrajectories([yumiTraj, newTraj]);
         else
-            yumiTraj = mergeTrajectories([yumiTraj,traj],["q"]);
-            for k = 1:7
-                newTraj(k).q = ones(length(traj(1).q),1)*iiwaTraj(k).q(length(iiwaTraj(1).q));
+            for k = 1:18
+                if k <= 7
+                    points(2,:) = [1,1,1,1];
+                    newTraj(k) = multiPointImpV(points, Ts);
+                    newTraj(k).q = newTraj(k).q*iiwaTraj(k).q(length(iiwaTraj(1).q));
+                    iiwaTraj(k) = mergeTrajectories([iiwaTraj(k), newTraj]);
+                end
+                yumiTraj(k) = mergeTrajectories([yumiTraj(k),traj(k)]);
             end
-            iiwaTraj = mergeTrajectories([iiwaTraj, newTraj],["q"]);
+            
         end
        
         %mergeTrajectories([iwaaTraj,traj]);
