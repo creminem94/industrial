@@ -7,9 +7,9 @@ iiwaRBT = loadrobot('kukaIiwa14');
 % iiwaSM = smimport(iiwaRBT);
 
 %% list of subtasks
-P1 = [1, 1, 1, pi, 0, pi/2]; % minipallet
-P2 = [2, 3, 5, 0, 0, pi/2]; % vicino al kuka
-P3 = [10, 10, 10, pi/4, pi/4, 0]; % vicino all'abb
+P1 = [1, 1, 0, 0, 0, 0]; % minipallet
+P2 = [2, 3, 0, 0, 0, pi/2]; % vicino al kuka
+P3 = [10, 10, 0, pi/4, pi/4, 0]; % vicino all'abb
 P4 = [1, 1, 1, pi, 0, pi/2]; % vicino al kuka
 %         startPos
 %         endPos
@@ -30,7 +30,7 @@ allocation = bestAllocation(subs, W);
 
 %% Tasks Simulation
 nTasks = length(subs);
-
+    
 iiwaIK = inverseKinematics('RigidBodyTree', iiwaRBT);
 yumiIK = inverseKinematics('RigidBodyTree', yumi);
 
