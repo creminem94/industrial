@@ -27,7 +27,7 @@ subs = [
 ];
 
 % Weight factors
-W = [1, 1, 1, 1];
+W = [0.8, 0.5, 0.4, 0.6];
 
 % Best allocation algorithm
 allocation = bestAllocation(subs, W);
