@@ -4,14 +4,15 @@ clc; clear all; close all;
 %% Best subtasks allocation
 
 % list of points in the workspace
-P1 = [1, 1, 0, 0, 0, 0];
-P2 = [2, 3, 0, 0, 0, pi/2];
+P1 = [1, 1, 0, pi, 0, 0];
+P2 = [2, 3, 0, 0, pi, pi/2];
 P3 = [10, 10, 0, pi/4, pi/4, 0];
 P4 = [1, 1, 1, pi, 0, pi/2];
 
 % List of subtasks:
 %   startPos
 %   endPos
+%   taskTime
 %   type (move, assembly)
 %   Dk
 %   Da
