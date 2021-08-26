@@ -3,11 +3,11 @@ clc; clear all; close all;
 
 %% Best subtasks allocation
 
-% 3D points in the work place
-P1 = [1, 1, 1, pi, 0, pi/2]; % minipallet
-P2 = [2, 3, 5, 0, 0, pi/2]; % vicino al kuka
-P3 = [10, 10, 10, pi/4, pi/4, 0]; % vicino all'abb
-P4 = [1, 1, 1, pi, 0, pi/2]; % vicino al kuka
+% list of points in the workspace
+P1 = [1, 1, 0, 0, 0, 0];
+P2 = [2, 3, 0, 0, 0, pi/2];
+P3 = [10, 10, 0, pi/4, pi/4, 0];
+P4 = [1, 1, 1, pi, 0, pi/2];
 
 % List of subtasks:
 %   startPos
