@@ -35,12 +35,12 @@ allocation = bestAllocation(subs, W);
 %% Tasks Simulation
 
 % Cobot models
-yumi = loadrobot('abbYuMi');
+yumiRBT = loadrobot('abbYuMi');
 iiwaRBT = loadrobot('kukaIiwa14');
 
 % Inverse kinematics of cobots
 iiwaIK = inverseKinematics('RigidBodyTree', iiwaRBT);
-yumiIK = inverseKinematics('RigidBodyTree', yumi);
+yumiIK = inverseKinematics('RigidBodyTree', yumiRBT);
 
 % Sampling time for trajectories
 Ts = 0.001;
@@ -55,7 +55,7 @@ for i=1:nTasks
         execIK = iiwaIK;
         execEEName = 'iiwa_link_ee_kuka';
 	else
-		execCobot = yumi;
+		execCobot = yumiRBT;
         execIK = yumiIK;
         execEEName = 'gripper_l_base';        
     end
@@ -112,13 +112,18 @@ for i=1:nTasks
     end % for j=1:nJoints
     
     if i == 1
+        %start building up the full trajectory, this is the case for 1st
+        %subtask
         if execCobot == iiwaRBT
-            iiwaTraj = traj;
+            iiwaTraj = traj; %first robot is iiwa, we copy in it the generated trajectory
             for k = 1:18
+                %for the other robot instead we create an "empty"
+                %trajectory for each joint
                 points(2,:) = [0,0,0,0];
                 yumiTraj(k) = multiPointImpV(points, Ts);
             end
         else
+            %inverted robots
             yumiTraj = traj;
             for k = 1:7
                 points(2,:) = [0,0,0,0];
@@ -126,19 +131,27 @@ for i=1:nTasks
             end
         end
     else
+        %for successive substasks
         if execCobot == iiwaRBT
-            for k = 1:18
-                if k <= 7 
+            for k = 1:18 %we add a new piece of trajectory to each joint
+                if k <= 7 %iiwa has 7 joints
+                    %iiwa is the current cobot so we merge the generated
+                    %trajectory
                     iiwaTraj(k) = mergeTrajectories([iiwaTraj(k),traj(k)]);
                 end
+                %here we create a fixed trajectory with value 1
                 points(2,:) = [1,1,1,1];
                 newTraj(k) = multiPointImpV(points, Ts);
-                newTraj(k).q = ones(length(traj(1).q),1)*yumiTraj(k).q(length(yumiTraj(k).q));
+                %we set each value of the trajectory equal to the last
+                %position of the other cobot 
+                newTraj(k).q = newTraj(k).q*yumiTraj(k).q(length(yumiTraj(k).q));
+                %so we merge this new piece of trajectory
                 yumiTraj(k) = mergeTrajectories([yumiTraj(k), newTraj(k)]);
             end
         else
+            %inverted robots
             for k = 1:18
-                if k <= 7
+                if k <= 7 %in this case is the iiwa that need a constant trajectory
                     points(2,:) = [1,1,1,1];
                     newTraj(k) = multiPointImpV(points, Ts);
                     newTraj(k).q = newTraj(k).q*iiwaTraj(k).q(length(iiwaTraj(k).q));
