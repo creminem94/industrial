@@ -7,7 +7,6 @@ function traj = multiPointImpV(points, Ts)
     ddq = [];
     dddq = [];
     t = [];
-    fprintf("Accelerations: ");
     for k=1:nPoints-1
         tk = points(1,k);
         tkp1 = points(1,k+1);
@@ -31,9 +30,7 @@ function traj = multiPointImpV(points, Ts)
         dq = [dq dP];
         ddq = [ddq ddP];
         dddq = [dddq dddP];
-        fprintf("%f,",ddq(tk/Ts+1));
     end
-    fprintf("%f\n",ddq(tkp1/Ts+1));
     traj.t = t;
     traj.q = q;
     traj.dq = dq;
